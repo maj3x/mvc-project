@@ -1,0 +1,42 @@
+@inject UserManager<AppUser> UserManager
+@{
+    var user = await UserManager.GetUserAsync(User);
+    var isTeacher = user != null && await UserManager.IsInRoleAsync(user, "Teacher");
+    var isAdmin = user != null && await UserManager.IsInRoleAsync(user, "Admin");
+}
+
+<div class="list-group list-group-flush">
+    <a href="/" class="list-group-item list-group-item-action">
+        <i class="fas fa-home me-2"></i>Ana Sayfa
+    </a>
+    
+    @if (User.Identity.IsAuthenticated)
+    {
+        <a href="/Todo" class="list-group-item list-group-item-action">
+            <i class="fas fa-tasks me-2"></i>Ödevlerim
+        </a>
+
+        @if (isTeacher)
+        {
+            <a href="/Assignment" class="list-group-item list-group-item-action">
+                <i class="fas fa-book me-2"></i>Ödev Yönetimi
+            </a>
+        }
+
+        @if (isAdmin)
+        {
+            <a href="/Admin" class="list-group-item list-group-item-action">
+                <i class="fas fa-user-shield me-2"></i>Yönetim Paneli
+            </a>
+            <a href="/Admin/Users" class="list-group-item list-group-item-action">
+                <i class="fas fa-users me-2"></i>Kullanıcılar
+            </a>
+            <a href="/Admin/Roles" class="list-group-item list-group-item-action">
+                <i class="fas fa-user-tag me-2"></i>Roller
+            </a>
+            <a href="/Category" class="list-group-item list-group-item-action">
+                <i class="fas fa-list me-2"></i>Kategoriler
+            </a>
+        }
+    }
+</div>

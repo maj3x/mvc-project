@@ -1,0 +1,38 @@
+@inject UserManager<AppUser> UserManager
+@{
+    var user = await UserManager.GetUserAsync(User);
+}
+
+<nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+    <div class="sb-sidenav-menu">
+        <div class="nav">
+            <div class="sb-sidenav-menu-heading">Genel</div>
+            <a class="nav-link" href="/Admin">
+                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                Dashboard
+            </a>
+
+            <div class="sb-sidenav-menu-heading">Yönetim</div>
+            <a class="nav-link" href="/Admin/Users">
+                <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+                Kullanıcılar
+            </a>
+            <a class="nav-link" href="/Admin/Roles">
+                <div class="sb-nav-link-icon"><i class="fas fa-user-tag"></i></div>
+                Roller
+            </a>
+            <a class="nav-link" href="/Category">
+                <div class="sb-nav-link-icon"><i class="fas fa-list"></i></div>
+                Kategoriler
+            </a>
+            <a class="nav-link" href="/Assignment">
+                <div class="sb-nav-link-icon"><i class="fas fa-tasks"></i></div>
+                Ödevler
+            </a>
+        </div>
+    </div>
+    <div class="sb-sidenav-footer">
+        <div class="small">Giriş yapan:</div>
+        @user?.Email
+    </div>
+</nav>

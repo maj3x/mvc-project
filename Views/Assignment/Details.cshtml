@@ -1,0 +1,121 @@
+@model AssignmentModel
+@using TaskManagementSystem.Models
+@inject UserManager<AppUser> UserManager
+
+@{
+    ViewData["Title"] = "Ödev Detayı";
+    Layout = "_LayoutAdmin";
+    var currentUser = await UserManager.GetUserAsync(User);
+    var isTeacher = await UserManager.IsInRoleAsync(currentUser, "Teacher");
+}
+
+<div class="container-fluid">
+    <h1 class="mt-4">Ödev Detayı</h1>
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <strong>Başlık:</strong>
+                </div>
+                <div class="col-md-9">
+                    @Model.Title
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <strong>Açıklama:</strong>
+                </div>
+                <div class="col-md-9">
+                    @Model.Description
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <strong>Kategori:</strong>
+                </div>
+                <div class="col-md-9">
+                    @Model.CategoryName
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <strong>Teslim Tarihi:</strong>
+                </div>
+                <div class="col-md-9">
+                    @Model.DueDate.ToString("dd/MM/yyyy HH:mm")
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <strong>Durum:</strong>
+                </div>
+                <div class="col-md-9">
+                    @if (!isTeacher)
+                    {
+                        <select class="form-select status-select" data-assignment-id="@Model.Id">
+                            @foreach (AssignmentStatus status in Enum.GetValues(typeof(AssignmentStatus)))
+                            {
+                                <option value="@((int)status)" selected="@(Model.Status == status)">
+                                    @status
+                                </option>
+                            }
+                        </select>
+
+                    }
+                    else
+                    {
+                        @Model.Status
+                    }
+                </div>
+            </div>
+
+            @if (isTeacher)
+            {
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <strong>Öğrenci:</strong>
+                    </div>
+                    <div class="col-md-9">
+                        @Model.AssignedToName
+                    </div>
+                </div>
+            }
+
+            <a asp-action="Index" class="btn btn-secondary">Geri Dön</a>
+            @if (isTeacher)
+            {
+                <a asp-action="Update" asp-route-id="@Model.Id" class="btn btn-warning">Düzenle</a>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @if (!isTeacher)
+    {
+        <script>
+            $(document).ready(function () {
+                $('.status-select').change(function () {
+                    var assignmentId = $(this).data('assignment-id');
+                    var status = $(this).val();
+                    
+                    $.post('/Assignment/UpdateStatus', { id: assignmentId, status: status })
+                        .done(function (response) {
+                            if (response.success) {
+                                toastr.success(response.message);
+                            } else {
+                                toastr.error(response.message);
+                            }
+                        })
+                        .fail(function () {
+                            toastr.error('Bir hata oluştu');
+                        });
+                });
+            });
+        </script>
+    }
+}

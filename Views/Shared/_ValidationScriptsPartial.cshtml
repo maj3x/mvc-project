@@ -1,2 +1,31 @@
-﻿<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+@* <script>
+    // Validation mesajları geçici olarak devre dışı bırakıldı
+    /*
+    jQuery.extend(jQuery.validator.messages, {
+        required: "Bu alan zorunludur.",
+        email: "Lütfen geçerli bir e-posta adresi giriniz.",
+        minlength: "Lütfen en az {0} karakter giriniz.",
+        maxlength: "Lütfen en fazla {0} karakter giriniz.",
+        equalTo: "Lütfen aynı değeri tekrar giriniz.",
+        remote: "Lütfen bu alanı düzeltiniz.",
+        date: "Lütfen geçerli bir tarih giriniz.",
+        dateISO: "Lütfen geçerli bir tarih giriniz (ISO).",
+        number: "Lütfen geçerli bir sayı giriniz.",
+        digits: "Lütfen sadece sayısal değerler giriniz.",
+        creditcard: "Lütfen geçerli bir kredi kartı numarası giriniz.",
+        accept: "Lütfen geçerli bir değer giriniz.",
+        pattern: "Lütfen geçerli bir format giriniz."
+    });
+
+    jQuery.validator.addMethod("turkishPhone", function(value, element) {
+        return this.optional(element) || /^(\+90|0)?[0-9]{10}$/.test(value);
+    }, "Lütfen geçerli bir telefon numarası giriniz.");
+
+    jQuery.validator.addMethod("strongPassword", function(value, element) {
+        return this.optional(element) || 
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/.test(value);
+    }, "Şifre en az bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir.");
+    */
+</script> *@

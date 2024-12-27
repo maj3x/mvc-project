@@ -1,7 +1,127 @@
-﻿<div class="jumbotron">
-    <h1 class="display-4">Ödev Dağıtım Portalı</h1>
-    <p class="lead">Öğretmen ve öğrenciler için ödev yönetim sistemi</p>
-    <hr class="my-4">
-    <p>Sistemi kullanmak için lütfen giriş yapın.</p>
-    <a class="btn btn-primary btn-lg" href="/Account/Login" role="button">Giriş Yap</a>
+@inject UserManager<AppUser> UserManager
+@{
+    ViewData["Title"] = "Ana Sayfa";
+    var currentUser = await UserManager.GetUserAsync(User);
+    var isTeacher = currentUser != null && await UserManager.IsInRoleAsync(currentUser, "Teacher");
+}
+
+<div class="container mt-4">
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="row">
+            <div class="col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Hoş Geldiniz, @currentUser?.FirstName @currentUser?.LastName</h5>
+                        <p class="card-text">Ödev Yönetim Sistemine hoş geldiniz.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Yönetim Paneli</h5>
+                            <p class="card-text">Sistem yönetimi için tıklayın.</p>
+                            <a href="/Admin" class="btn btn-light">Yönetim Paneline Git</a>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="col-md-4 mb-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Ödevlerim</h5>
+                        <p class="card-text">@(isTeacher ? "Ödev takibi için tıklayın." : "Ödevlerinizi görüntüleyin.")</p>
+                        <a href="/Todo" class="btn btn-light">Ödevlere Git</a>
+                    </div>
+                </div>
+            </div>
+
+            @if (isTeacher)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Ödev Yönetimi</h5>
+                            <p class="card-text">Ödev ekleme ve düzenleme için tıklayın.</p>
+                            <a href="/Assignment" class="btn btn-light">Ödev Yönetimine Git</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (!isTeacher)
+        {
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Yaklaşan Ödevler</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="upcomingAssignments">
+                                <!-- AJAX ile doldurulacak -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-6 offset-md-3 text-center">
+                <h1 class="display-4">Ödev Yönetim Sistemi</h1>
+                <p class="lead">Ödevlerinizi takip etmek için giriş yapın.</p>
+                <div class="mt-4">
+                    <a href="/Home/Login" class="btn btn-primary btn-lg me-2">Giriş Yap</a>
+                    <a href="/Home/Register" class="btn btn-success btn-lg">Kayıt Ol</a>
+                </div>
+            </div>
+        </div>
+    }
 </div>
+
+@section Scripts {
+    @if (User.Identity.IsAuthenticated && !isTeacher)
+    {
+        <script>
+            $(document).ready(function() {
+                loadUpcomingAssignments();
+            });
+
+            function loadUpcomingAssignments() {
+                $.get('/Todo/GetTodoList', function(data) {
+                    var html = '';
+                    var upcomingAssignments = data.filter(x => new Date(x.dueDate) > new Date())
+                                                .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+                                                .slice(0, 5);
+
+                    if (upcomingAssignments.length === 0) {
+                        html = '<div class="alert alert-info">Yaklaşan ödev bulunmuyor.</div>';
+                    } else {
+                        upcomingAssignments.forEach(function(assignment) {
+                            var alertClass = assignment.isLate ? 'alert-danger' : 'alert-warning';
+                            html += `
+                                <div class="alert ${alertClass}">
+                                    <strong>${assignment.title}</strong><br>
+                                    Teslim Tarihi: ${assignment.dueDate}<br>
+                                    Durum: ${assignment.status}
+                                </div>`;
+                        });
+                    }
+
+                    $('#upcomingAssignments').html(html);
+                });
+            }
+        </script>
+    }
+}
